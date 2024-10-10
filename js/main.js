@@ -61,7 +61,7 @@ const generatePhotos = () => {
       comments: generateComments()
     });
   }
-
+  
   return photos;
 };
 
