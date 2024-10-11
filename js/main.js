@@ -1,3 +1,14 @@
+const MIN_LIKES = 15;
+const MAX_LIKES = 200;
+const MIN_COMMENTS = 0;
+const MAX_COMMENTS = 30;
+const MIN_AVATAR_ID = 1;
+const MAX_AVATAR_ID = 6;
+const MIN_PHOTO_ID = 1;
+const MAX_PHOTO_ID = 25;
+const MIN_COMMENT_ID = 100;
+const MAX_COMMENT_ID = 999;
+
 const getRandomNumber = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
 
 const names = ['Артём', 'Иван', 'Ольга', 'Мария', 'Дмитрий', 'Александр', 'Елена', 'Сергей', 'Анна', 'Наталья'];
@@ -18,21 +29,21 @@ const generateRandomComment = (commentId) => {
 
   return {
     id: commentId,
-    avatar: `img/avatar-${getRandomNumber(1, 6)}.svg`,
+    avatar: `img/avatar-${getRandomNumber(MIN_AVATAR_ID, MAX_AVATAR_ID)}.svg`,
     message: message,
     name: names[getRandomNumber(0, names.length - 1)]
   };
 };
 
 const generateComments = () => {
-  const commentsCount = getRandomNumber(0, 30);
+  const commentsCount = getRandomNumber(MIN_COMMENTS, MAX_COMMENTS);
   const comments = [];
   const usedCommentIds = new Set();
 
   for (let i = 0; i < commentsCount; i++) {
     let commentId;
     do {
-      commentId = getRandomNumber(100, 999); 
+      commentId = getRandomNumber(MIN_COMMENT_ID, MAX_COMMENT_ID); 
     } while (usedCommentIds.has(commentId));
     usedCommentIds.add(commentId);
 
@@ -46,10 +57,10 @@ const generatePhotos = () => {
   const photos = [];
   const usedPhotoIds = new Set();
 
-  for (let i = 1; i <= 25; i++) {
+  for (let i = MIN_PHOTO_ID; i <= MAX_PHOTO_ID; i++) {
     let id;
     do {
-      id = getRandomNumber(1, 25);
+      id = getRandomNumber(MIN_PHOTO_ID, MAX_PHOTO_ID);
     } while (usedPhotoIds.has(id));
     usedPhotoIds.add(id);
 
@@ -57,7 +68,7 @@ const generatePhotos = () => {
       id: id,
       url: `photos/${id}.jpg`,
       description: `Описание фотографии номер ${id}`,
-      likes: getRandomNumber(15, 200),
+      likes: getRandomNumber(MIN_LIKES, MAX_LIKES),
       comments: generateComments()
     });
   }
