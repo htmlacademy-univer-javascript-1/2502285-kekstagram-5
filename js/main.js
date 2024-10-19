@@ -25,11 +25,11 @@ const messages = [
 const generateRandomComment = (commentId) => {
   const message = getRandomNumber(1, 2) === 1 
     ? messages[getRandomNumber(0, messages.length - 1)]
-    : ${messages[getRandomNumber(0, messages.length - 1)]} ${messages[getRandomNumber(0, messages.length - 1)]};
+    : `${messages[getRandomNumber(0, messages.length - 1)]} ${messages[getRandomNumber(0, messages.length - 1)]}`;
 
   return {
     id: commentId,
-    avatar: img/avatar-${getRandomNumber(MIN_AVATAR_ID, MAX_AVATAR_ID)}.svg,
+    avatar: `img/avatar-${getRandomNumber(MIN_AVATAR_ID, MAX_AVATAR_ID)}.svg`,
     message: message,
     name: names[getRandomNumber(0, names.length - 1)]
   };
@@ -67,7 +67,7 @@ const generatePhotos = () => {
     photos.push({
       id: id,
       url: photos/${id}.jpg,
-      description: Описание фотографии номер ${id},
+      description: `Описание фотографии номер ${id}`,
       likes: getRandomNumber(MIN_LIKES, MAX_LIKES),
       comments: generateComments()
     });
