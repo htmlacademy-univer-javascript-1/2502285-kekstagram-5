@@ -18,9 +18,9 @@ export const generatePhotos = () => {
       url: `photos/${id}.jpg`,
       description: `Описание фотографии номер ${id}`,
       likes: getRandomNumber(MIN_LIKES, MAX_LIKES),
-      comments: generateComments()
+      comments: generateComments(),
     });
   }
-  
+
   return photos;
 };
