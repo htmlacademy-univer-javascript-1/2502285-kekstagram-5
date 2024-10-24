@@ -1,50 +1,20 @@
-function isStringValid(string, maxLength) {
-  return string.length <= maxLength;
-}
+// 5.16 Функции возвращаются
+const parseTime = (time) => {
+  const [hours, minutes] = time.split(':').map(Number);
+  return hours * 60 + minutes;
+};
 
-console.log(isStringValid('проверяемая строка', 20)); // true
-console.log(isStringValid('проверяемая строка', 18)); // true
-console.log(isStringValid('проверяемая строка', 10)); // false
+const inWorkRange = (startWork, endWork, startMeeting, duration) => {
+  const workStart = parseTime(startWork);
+  const workEnd = parseTime(endWork);
+  const meetingStart = parseTime(startMeeting);
+  const meetingEnd = meetingStart + duration;
 
-function isPalindrome(string) {
-  const normalizedString = string.replaceAll(' ', '').toLowerCase();
+  return meetingStart >= workStart && meetingEnd <= workEnd;
+};
 
-  let reversedString = '';
-
-  for (let i = normalizedString.length - 1; i >= 0; i--) {
-    reversedString += normalizedString[i];
-  }
-
-  return normalizedString === reversedString;
-}
-
-console.log(isPalindrome('топот')); // true
-console.log(isPalindrome('ДовОд')); // true
-console.log(isPalindrome('Кекс')); // false
-console.log(isPalindrome('Лёша на полке клопа нашёл')); // true
-
-function extractNumber(input) {
-  const string = input.toString();
-  let result = '';
-
-  for (let i = 0; i < string.length; i++) {
-    const char = string[i];
-
-    const digit = parseInt(char, 10);
-
-    if (!Number.isNaN(digit)) {
-      result += digit;
-    }
-  }
-
-  return result.length > 0 ? parseInt(result, 10) : NaN;
-}
-
-console.log(extractNumber('2023 год')); // 2023
-console.log(extractNumber('ECMAScript 2022')); // 2022
-console.log(extractNumber('1 кефир, 0.5 батона')); // 105
-console.log(extractNumber('агент 007')); // 7
-console.log(extractNumber('а я томат')); // NaN
-console.log(extractNumber(2023)); // 2023
-console.log(extractNumber(-1)); // 1
-console.log(extractNumber(1.5)); // 15
+console.log(inWorkRange('08:00', '17:30', '14:00', 90)); // true
+console.log(inWorkRange('8:0', '10:0', '8:0', 120)); // true
+console.log(inWorkRange('08:00', '14:30', '14:00', 90)); // false
+console.log(inWorkRange('14:00', '17:30', '08:0', 90)); // false
+console.log(inWorkRange('8:00', '17:30', '08:00', 900)); // false
