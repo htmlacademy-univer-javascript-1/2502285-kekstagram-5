@@ -1,4 +1,5 @@
 import { generatePhotos } from './photos.js';
+import { showBigPicture } from './bigPicture.js';
 
 export const renderThumbnails = () => {
   const photos = generatePhotos();
@@ -13,6 +14,10 @@ export const renderThumbnails = () => {
     pictureElement.querySelector('.picture__img').alt = photo.description;
     pictureElement.querySelector('.picture__likes').textContent = photo.likes;
     pictureElement.querySelector('.picture__comments').textContent = photo.comments.length;
+
+    pictureElement.addEventListener('click', () => {
+      showBigPicture(photo);
+    });
 
     fragment.appendChild(pictureElement);
   });
