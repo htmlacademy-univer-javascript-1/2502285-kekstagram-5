@@ -101,11 +101,12 @@ const closeForm = () => {
 };
 
 const validateHashtags = (value) => {
+  if (!value || !value.trim()) {
+    return true;
+  }
   const hashtags = value.toLowerCase().trim().split(/\s+/);
-  const isValid = hashtags.every((hashtag) => {
-    const validRegex = /^#[a-zа-яё0-9]{1,19}$/;
-    return validRegex.test(hashtag);
-  });
+  const validRegex = /^#[a-zа-яё0-9]{1,19}$/;
+  const isValid = hashtags.every((hashtag) => validRegex.test(hashtag));
   const unique = new Set(hashtags).size === hashtags.length;
   return hashtags.length <= 5 && isValid && unique;
 };
