@@ -1,6 +1,8 @@
-import { generatePhotos } from './photos.js';
 import { renderThumbnails } from './thumb.js';
+import { fetchPhotos } from './api.js';
 import './validation.js';
 
-const photoDescriptions = generatePhotos();
-renderThumbnails(photoDescriptions);
+fetchPhotos()
+  .then(renderThumbnails)
+  .catch((error) => console.error('Ошибка загрузки фотографий:', error));
+
