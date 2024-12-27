@@ -1,8 +1,6 @@
-import { generatePhotos } from './photos.js';
 import { showBigPicture } from './bigPicture.js';
 
-export const renderThumbnails = () => {
-  const photos = generatePhotos();
+export const renderThumbnails = (photos) => {
   const picturesContainer = document.querySelector('.pictures');
   const pictureTemplate = document.querySelector('#picture').content.querySelector('.picture');
 
