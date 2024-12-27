@@ -1,5 +1,6 @@
 import Pristine from '../vendor/pristine/pristine.min.js';
 import { resetEffects } from './effects.js';
+import { sendPhotoData } from './api.js';
 
 const form = document.querySelector('.img-upload__form');
 const fileInput = form.querySelector('.img-upload__input');
@@ -12,7 +13,9 @@ const scaleControlSmaller = form.querySelector('.scale__control--smaller');
 const scaleControlBigger = form.querySelector('.scale__control--bigger');
 const scaleControlValue = form.querySelector('.scale__control--value');
 const previewImage = form.querySelector('.img-upload__preview img');
+const effectsPreviews = form.querySelectorAll('.effects__preview');
 
+const FILE_TYPES = ['jpg', 'jpeg', 'png'];
 const DEFAULT_SCALE = 100;
 const MIN_SCALE = 25;
 const MAX_SCALE = 100;
@@ -46,8 +49,27 @@ const closeForm = () => {
   overlay.classList.add('hidden');
   body.classList.remove('modal-open');
   form.reset();
+  previewImage.src = 'img/upload-default-image.jpg';
   previewImage.style.transform = '';
   resetEffects();
+};
+
+const onFileChange = () => {
+  const file = fileInput.files[0];
+  const fileName = file.name.toLowerCase();
+  const matches = FILE_TYPES.some((type) => fileName.endsWith(type));
+
+  if (matches) {
+    const reader = new FileReader();
+    reader.addEventListener('load', () => {
+      previewImage.src = reader.result;
+      effectsPreviews.forEach((preview) => {
+        preview.style.backgroundImage = `url(${reader.result})`;
+      });
+    });
+    reader.readAsDataURL(file);
+    showForm();
+  }
 };
 
 const validateHashtags = (value) => {
@@ -73,13 +95,17 @@ const pristine = new Pristine(form, {
 pristine.addValidator(hashtagInput, validateHashtags, 'Некорректные хэш-теги');
 pristine.addValidator(commentInput, validateComment, 'Комментарий не может быть длиннее 140 символов');
 
-fileInput.addEventListener('change', showForm);
-cancelButton.addEventListener('click', closeForm);
-
-form.addEventListener('submit', (event) => {
+form.addEventListener('submit', async (event) => {
   event.preventDefault();
   if (pristine.validate()) {
-    form.submit();
+    const formData = new FormData(form);
+    try {
+      await sendPhotoData(formData);
+      closeForm();
+      alert('Фотография успешно загружена!');
+    } catch (error) {
+      alert('Ошибка загрузки файла. Попробуйте ещё раз.');
+    }
   }
 });
 
@@ -91,3 +117,5 @@ const stopEscPropagation = (event) => {
 
 hashtagInput.addEventListener('keydown', stopEscPropagation);
 commentInput.addEventListener('keydown', stopEscPropagation);
+fileInput.addEventListener('change', onFileChange);
+cancelButton.addEventListener('click', closeForm);
