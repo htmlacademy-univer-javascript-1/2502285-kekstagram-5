@@ -1,64 +1,87 @@
-import noUiSlider from '../vendor/nouislider/nouislider.js';
+const SCALE_STEP = 25;
+const MIN_SCALE = 25;
+const MAX_SCALE = 100;
+const DEFAULT_SCALE = 100;
+const SCALE_UPDATE = 100;
 
-const DEFAULT_EFFECT = 'none';
-const EFFECTS = {
-  none: { filter: '', min: 0, max: 0, step: 0 },
-  chrome: { filter: 'grayscale', min: 0, max: 1, step: 0.1 },
-  sepia: { filter: 'sepia', min: 0, max: 1, step: 0.1 },
+const EFFECT_CONFIGS = {
+  none: { filter: '', min: 0, max: 100, step: 1, unit: '' },
+  chrome: { filter: 'grayscale', min: 0, max: 1, step: 0.1, unit: '' },
+  sepia: { filter: 'sepia', min: 0, max: 1, step: 0.1, unit: '' },
   marvin: { filter: 'invert', min: 0, max: 100, step: 1, unit: '%' },
   phobos: { filter: 'blur', min: 0, max: 3, step: 0.1, unit: 'px' },
-  heat: { filter: 'brightness', min: 1, max: 3, step: 0.1 },
+  heat: { filter: 'brightness', min: 1, max: 3, step: 0.1, unit: '' },
 };
 
-const effectSliderContainer = document.querySelector('.img-upload__effect-level');
-const effectSliderElement = document.querySelector('.effect-level__slider');
-const effectLevelValue = document.querySelector('.effect-level__value');
-const effectsRadioButtons = document.querySelectorAll('.effects__radio');
-const previewImage = document.querySelector('.img-upload__preview img');
+const elements = {
+  scaleSmaller: document.querySelector('.scale__control--smaller'),
+  scaleBigger: document.querySelector('.scale__control--bigger'),
+  scaleValue: document.querySelector('.scale__control--value'),
+  previewImage: document.querySelector('.img-upload__preview img'),
+  effectLevel: document.querySelector('.effect-level__slider'),
+  effectContainer: document.querySelector('.img-upload__effect-level'),
+};
 
-let currentEffect = DEFAULT_EFFECT;
+let activeEffect = EFFECT_CONFIGS.none;
 
-const applyEffect = (effect) => {
-  const effectSettings = EFFECTS[effect];
-  if (effect === 'none') {
-    previewImage.style.filter = '';
-    effectSliderContainer.classList.add('hidden');
+function adjustScale(newScale) {
+  elements.scaleValue.value = `${newScale}%`;
+  elements.previewImage.style.transform = `scale(${newScale / SCALE_UPDATE})`;
+}
+
+function handleScaleSmaller() {
+  const currentScale = parseInt(elements.scaleValue.value, 10);
+  adjustScale(Math.max(currentScale - SCALE_STEP, MIN_SCALE));
+}
+
+function handleScaleBigger() {
+  const currentScale = parseInt(elements.scaleValue.value, 10);
+  adjustScale(Math.min(currentScale + SCALE_STEP, MAX_SCALE));
+}
+
+function resetEffects() {
+  elements.effectContainer.classList.add('hidden');
+  elements.previewImage.style.filter = '';
+  activeEffect = EFFECT_CONFIGS.none;
+  adjustScale(DEFAULT_SCALE);
+}
+
+function updateEffect() {
+  const effectValue = elements.effectLevel.noUiSlider.get();
+  elements.previewImage.style.filter = `${activeEffect.filter}(${effectValue}${activeEffect.unit})`;
+}
+
+function initializeEffect(effectName) {
+  activeEffect = EFFECT_CONFIGS[effectName];
+  if (effectName === 'none') {
+    resetEffects();
   } else {
-    effectSliderContainer.classList.remove('hidden');
-    effectSliderElement.noUiSlider.updateOptions({
-      range: { min: effectSettings.min, max: effectSettings.max },
-      start: effectSettings.max,
-      step: effectSettings.step,
+    elements.effectContainer.classList.remove('hidden');
+    noUiSlider.create(elements.effectLevel, {
+      range: { min: activeEffect.min, max: activeEffect.max },
+      start: activeEffect.max,
+      step: activeEffect.step,
+      connect: 'lower',
     });
+    elements.effectLevel.noUiSlider.on('update', updateEffect);
   }
-};
+}
 
-effectSliderElement.noUiSlider.on('update', (_, handle, values) => {
-  const value = values[handle];
-  effectLevelValue.value = value;
-  if (currentEffect !== 'none') {
-    const effectSettings = EFFECTS[currentEffect];
-    previewImage.style.filter = `${effectSettings.filter}(${value}${effectSettings.unit || ''})`;
+function onEffectChange(event) {
+  if (event.target.matches('.effects__radio')) {
+    const selectedEffect = event.target.value;
+    if (elements.effectLevel.noUiSlider) {
+      elements.effectLevel.noUiSlider.destroy();
+    }
+    initializeEffect(selectedEffect);
   }
-});
+}
 
-noUiSlider.create(effectSliderElement, {
-  range: { min: 0, max: 100 },
-  start: 100,
-  step: 1,
-  connect: 'lower',
-});
-effectSliderContainer.classList.add('hidden');
+function initEffects() {
+  elements.scaleSmaller.addEventListener('click', handleScaleSmaller);
+  elements.scaleBigger.addEventListener('click', handleScaleBigger);
+  document.querySelector('.effects__list').addEventListener('change', onEffectChange);
+  resetEffects();
+}
 
-effectsRadioButtons.forEach((radioButton) => {
-  radioButton.addEventListener('change', () => {
-    currentEffect = radioButton.value;
-    applyEffect(currentEffect);
-  });
-});
-
-export const resetEffects = () => {
-  currentEffect = DEFAULT_EFFECT;
-  previewImage.style.filter = '';
-  effectSliderContainer.classList.add('hidden');
-};
+export { initEffects, resetEffects };

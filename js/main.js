@@ -1,12 +1,18 @@
 import { renderThumbnails } from './thumb.js';
-import { fetchPhotos } from './api.js';
-import { initFilters } from './filters.js';
-import './validation.js';
+import { getData } from './api.js';
+import { initFilter } from './filters.js';
+import { initEffects } from './effects.js';
+import { initValidation } from './validation.js';
 
-fetchPhotos()
+renderThumbnails();
+
+initEffects();
+
+initValidation();
+
+getData()
   .then((photos) => {
     renderThumbnails(photos);
-    initFilters(photos);
+    initFilter(photos);
   })
   .catch((error) => console.error('Ошибка загрузки фотографий:', error));
-
