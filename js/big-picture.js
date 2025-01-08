@@ -15,6 +15,8 @@ const commentFragment = document.createDocumentFragment();
 let commentsCount = COMMENTS_STEP;
 let currentComments = [];
 
+const isEscapeKey = (evt) => evt.key === 'Escape';
+
 const createComment = (comment) => {
   const newComment = document.createElement('li');
   const imgComment = document.createElement('img');
@@ -64,7 +66,7 @@ const hideBigPicture = () => {
 };
 
 function onDocumentKeydown(evt) {
-  if (isEscapeKey) {
+  if (isEscapeKey(evt)) {
     evt.preventDefault();
     hideBigPicture();
   }
@@ -75,7 +77,7 @@ const onCanselbuttonClick = () => {
 };
 
 const openBigPicture = (data) => {
-  const {url, comments, likes, description} = data;
+  const { url, comments, likes, description } = data;
 
   bigPicture.classList.remove('hidden');
   body.classList.add('modal-open');

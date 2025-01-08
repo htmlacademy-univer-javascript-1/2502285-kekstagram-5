@@ -8,8 +8,7 @@ const getData = async () => {
     }
     return await response.json();
   } catch (error) {
-    console.error('Не удалось загрузить данные:', error.message);
-    throw error;
+    throw new Error(`Не удалось загрузить данные: ${error.message}`);
   }
 };
 
@@ -23,10 +22,8 @@ const sendData = async (data) => {
       throw new Error('Ошибка при отправке данных');
     }
   } catch (error) {
-    console.error('Не удалось отправить данные:', error.message);
-    throw error;
+    throw new Error(`Не удалось отправить данные: ${error.message}`);
   }
 };
 
 export { getData, sendData };
-

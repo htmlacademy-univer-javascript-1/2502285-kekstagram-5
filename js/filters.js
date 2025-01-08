@@ -26,7 +26,7 @@ const sortByPopularity = (first, second) =>
   second.comments.length - first.comments.length;
 
 const processPictures = () => {
-  let result = imageCollection.slice();
+  const result = imageCollection.slice();
 
   switch (activeFilter) {
     case FilterOptions.RANDOMIZED:

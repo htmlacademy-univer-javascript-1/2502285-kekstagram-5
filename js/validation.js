@@ -13,14 +13,24 @@ const ErrorMessages = {
 
 const elements = {
   form: document.querySelector('.img-upload__form'),
-  inputFile: document.querySelector('.img-upload__input'),
-  overlay: document.querySelector('.img-upload__overlay'),
-  hashtagsInput: document.querySelector('.text__hashtags'),
-  descriptionInput: document.querySelector('.text__description'),
-  closeButton: document.querySelector('.img-upload__cancel'),
-  submitButton: document.querySelector('.img-upload__submit'),
-  previewImage: document.querySelector('.img-upload__preview img'),
+  inputFile: null,
+  overlay: null,
+  hashtagsInput: null,
+  descriptionInput: null,
+  closeButton: null,
+  submitButton: null,
+  previewImage: null,
 };
+
+function initFormElements() {
+  elements.inputFile = elements.form.querySelector('.img-upload__input');
+  elements.overlay = elements.form.querySelector('.img-upload__overlay');
+  elements.hashtagsInput = elements.form.querySelector('.text__hashtags');
+  elements.descriptionInput = elements.form.querySelector('.text__description');
+  elements.closeButton = elements.form.querySelector('.img-upload__cancel');
+  elements.submitButton = elements.form.querySelector('.img-upload__submit');
+  elements.previewImage = elements.form.querySelector('.img-upload__preview img');
+}
 
 const pristine = new Pristine(elements.form, {
   classTo: 'img-upload__field-wrapper',
@@ -55,11 +65,13 @@ function closeForm() {
   elements.overlay.classList.add('hidden');
   document.body.classList.remove('modal-open');
   resetEffects();
+  document.removeEventListener('keydown', onFormKeydown);
 }
 
 function openForm() {
   elements.overlay.classList.remove('hidden');
   document.body.classList.add('modal-open');
+  document.addEventListener('keydown', onFormKeydown);
 }
 
 function handleFormSubmit(event) {
@@ -84,30 +96,86 @@ function handleFormSubmit(event) {
     });
 }
 
+function onFormKeydown(evt) {
+  if (evt.key === 'Escape' && !document.activeElement.classList.contains('text__hashtags') &&
+      !document.activeElement.classList.contains('text__description')) {
+    evt.preventDefault();
+    closeForm();
+  }
+}
+
 function displaySuccessMessage() {
   const successTemplate = document.querySelector('#success').content.cloneNode(true);
-  document.body.appendChild(successTemplate);
+  const successElement = successTemplate.querySelector('.success');
+  document.body.appendChild(successElement);
 
-  const successButton = document.querySelector('.success__button');
+  const successButton = successElement.querySelector('.success__button');
+
+  function onSuccessMessageKeydown(evt) {
+    if (evt.key === 'Escape') {
+      evt.preventDefault();
+      successElement.remove();
+      document.removeEventListener('keydown', onSuccessMessageKeydown);
+      document.removeEventListener('click', onSuccessMessageOverlayClick);
+    }
+  }
+
+  function onSuccessMessageOverlayClick(evt) {
+    if (evt.target === successElement) {
+      successElement.remove();
+      document.removeEventListener('keydown', onSuccessMessageKeydown);
+      document.removeEventListener('click', onSuccessMessageOverlayClick);
+    }
+  }
+
   successButton.addEventListener('click', () => {
-    document.querySelector('.success').remove();
+    successElement.remove();
+    document.removeEventListener('keydown', onSuccessMessageKeydown);
+    document.removeEventListener('click', onSuccessMessageOverlayClick);
   });
+
+  document.addEventListener('keydown', onSuccessMessageKeydown);
+  document.addEventListener('click', onSuccessMessageOverlayClick);
 }
 
 function displayErrorMessage(message) {
   const errorTemplate = document.querySelector('#error').content.cloneNode(true);
   const errorElement = errorTemplate.querySelector('.error');
   errorElement.querySelector('.error__title').textContent = message;
-
   document.body.appendChild(errorElement);
 
   const errorButton = errorElement.querySelector('.error__button');
+
+  function onErrorMessageKeydown(evt) {
+    if (evt.key === 'Escape') {
+      evt.preventDefault();
+      errorElement.remove();
+      document.removeEventListener('keydown', onErrorMessageKeydown);
+      document.removeEventListener('click', onErrorMessageOverlayClick);
+    }
+  }
+
+  function onErrorMessageOverlayClick(evt) {
+    if (evt.target === errorElement) {
+      errorElement.remove();
+      document.removeEventListener('keydown', onErrorMessageKeydown);
+      document.removeEventListener('click', onErrorMessageOverlayClick);
+    }
+  }
+
   errorButton.addEventListener('click', () => {
     errorElement.remove();
+    document.removeEventListener('keydown', onErrorMessageKeydown);
+    document.removeEventListener('click', onErrorMessageOverlayClick);
   });
+
+  document.addEventListener('keydown', onErrorMessageKeydown);
+  document.addEventListener('click', onErrorMessageOverlayClick);
 }
 
 function initValidation() {
+  initFormElements();
+
   elements.inputFile.addEventListener('change', (evt) => {
     const file = evt.target.files[0];
     if (file) {

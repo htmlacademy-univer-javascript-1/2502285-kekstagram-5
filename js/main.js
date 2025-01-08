@@ -15,4 +15,6 @@ getData()
     renderThumbnails(photos);
     initFilter(photos);
   })
-  .catch((error) => console.error('Ошибка загрузки фотографий:', error));
+  .catch(() => {
+    throw new Error('Ошибка загрузки фотографий');
+  });
